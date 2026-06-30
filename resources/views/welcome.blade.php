@@ -101,8 +101,9 @@
                 @forelse ($journals as $journal)
                     <article class="journal-card">
                         @if ($journal->photo_path)
-                            <a class="photo-link" href="{{ Storage::url($journal->photo_path) }}" target="_blank" rel="noreferrer">
-                                <img src="{{ Storage::url($journal->photo_path) }}" alt="Dokumentasi {{ $journal->title }}">
+                            @php($photoUrl = asset('storage/'.$journal->photo_path))
+                            <a class="photo-link" href="{{ $photoUrl }}" target="_blank" rel="noreferrer">
+                                <img src="{{ $photoUrl }}" alt="Dokumentasi {{ $journal->title }}">
                             </a>
                         @else
                             <div class="photo-placeholder" aria-hidden="true">

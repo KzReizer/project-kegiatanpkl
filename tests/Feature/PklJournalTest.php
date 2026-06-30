@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\PklJournal;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -15,21 +16,24 @@ class PklJournalTest extends TestCase
     {
         Storage::fake('public');
 
-        $response = $this->post('/jurnal', [
+        $response = $this->followingRedirects()->post('/jurnal', [
             'activity_date' => now()->toDateString(),
             'title' => 'Membuat halaman laporan',
             'description' => 'Mengumpulkan dokumentasi dan menulis catatan kegiatan harian.',
             'photo' => UploadedFile::fake()->image('dokumentasi.jpg'),
         ]);
 
-        $response->assertRedirect('/');
+        $response
+            ->assertOk()
+            ->assertSee('Membuat halaman laporan')
+            ->assertSee('Mengumpulkan dokumentasi dan menulis catatan kegiatan harian.');
 
         $this->assertDatabaseHas('pkl_journals', [
             'title' => 'Membuat halaman laporan',
             'description' => 'Mengumpulkan dokumentasi dan menulis catatan kegiatan harian.',
         ]);
 
-        $journal = \App\Models\PklJournal::firstOrFail();
+        $journal = PklJournal::firstOrFail();
 
         Storage::disk('public')->assertExists($journal->photo_path);
     }
