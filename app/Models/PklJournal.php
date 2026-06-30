@@ -2,18 +2,19 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PklJournal extends Model
 {
-    /** @use HasFactory<\Database\Factories\PklJournalFactory> */
-    use HasFactory;
-
     protected $fillable = [
         'activity_date',
         'title',
+        'location',
+        'category',
         'description',
+        'learning',
+        'obstacle',
+        'next_plan',
         'photo_path',
         'photo_original_name',
     ];

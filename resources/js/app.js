@@ -1,8 +1,11 @@
-const photoInput = document.querySelector('#photo-input');
-const photoName = document.querySelector('#photo-name');
+document.querySelectorAll('.photo-input').forEach((photoInput) => {
+    const photoName = photoInput.closest('.file-field')?.querySelector('.photo-name');
 
-if (photoInput && photoName) {
+    if (!photoName) {
+        return;
+    }
+
     photoInput.addEventListener('change', () => {
         photoName.textContent = photoInput.files?.[0]?.name || 'Belum ada foto dipilih';
     });
-}
+});
