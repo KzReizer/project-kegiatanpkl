@@ -1,0 +1,446 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+:root {
+    --bg: #f6f7f4;
+    --surface: #ffffff;
+    --surface-muted: #eef3ef;
+    --ink: #1e2724;
+    --muted: #66736e;
+    --line: #d9e0dc;
+    --accent: #0f8f7f;
+    --accent-dark: #0a665b;
+    --warm: #d68b25;
+    --danger: #b73535;
+    --shadow: 0 16px 45px rgba(21, 34, 30, 0.08);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    background:
+        linear-gradient(180deg, rgba(15, 143, 127, 0.1), transparent 320px),
+        var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+}
+
+button,
+input,
+textarea {
+    font: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+.app-shell {
+    width: min(1180px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 32px 0 48px;
+}
+
+.topbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 430px);
+    gap: 24px;
+    align-items: end;
+    padding: 28px 0;
+}
+
+.eyebrow {
+    margin: 0 0 8px;
+    color: var(--accent-dark);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0;
+    text-transform: uppercase;
+}
+
+h1,
+h2,
+h3,
+p {
+    margin-top: 0;
+}
+
+h1 {
+    margin-bottom: 12px;
+    font-size: clamp(2rem, 4vw, 3.35rem);
+    line-height: 1;
+    letter-spacing: 0;
+}
+
+h2 {
+    margin-bottom: 0;
+    font-size: 1.3rem;
+    line-height: 1.2;
+}
+
+h3 {
+    margin-bottom: 8px;
+    font-size: 1.05rem;
+    line-height: 1.35;
+}
+
+.lede {
+    max-width: 680px;
+    margin-bottom: 0;
+    color: var(--muted);
+    font-size: 1.02rem;
+    line-height: 1.7;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.summary-item {
+    min-height: 94px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.72);
+    box-shadow: var(--shadow);
+}
+
+.summary-value,
+.summary-label {
+    display: block;
+}
+
+.summary-value {
+    color: var(--accent-dark);
+    font-size: 2rem;
+    font-weight: 850;
+    line-height: 1;
+}
+
+.summary-label {
+    margin-top: 8px;
+    color: var(--muted);
+    font-size: 0.86rem;
+}
+
+.notice {
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    border: 1px solid rgba(15, 143, 127, 0.26);
+    border-radius: 8px;
+    background: #e8f7f3;
+    color: var(--accent-dark);
+    font-weight: 700;
+}
+
+.workspace {
+    display: grid;
+    grid-template-columns: minmax(310px, 390px) minmax(0, 1fr);
+    gap: 22px;
+    align-items: start;
+}
+
+.entry-form,
+.journal-panel {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.entry-form {
+    position: sticky;
+    top: 18px;
+    display: grid;
+    gap: 16px;
+    padding: 22px;
+}
+
+.section-heading {
+    padding-bottom: 4px;
+}
+
+.field,
+.file-field {
+    display: grid;
+    gap: 8px;
+}
+
+.field span,
+.file-field span {
+    color: #31413c;
+    font-size: 0.9rem;
+    font-weight: 750;
+}
+
+.field input,
+.field textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fbfcfb;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.field input {
+    min-height: 44px;
+    padding: 0 12px;
+}
+
+.field textarea {
+    min-height: 178px;
+    padding: 12px;
+    line-height: 1.55;
+    resize: vertical;
+}
+
+.field input:focus,
+.field textarea:focus {
+    border-color: rgba(15, 143, 127, 0.75);
+    box-shadow: 0 0 0 3px rgba(15, 143, 127, 0.12);
+}
+
+.field small,
+.file-field small {
+    color: var(--danger);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.file-field {
+    padding: 14px;
+    border: 1px dashed #afbbb6;
+    border-radius: 8px;
+    background: var(--surface-muted);
+}
+
+.file-field input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+}
+
+.file-field strong {
+    display: inline-flex;
+    width: fit-content;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 0 14px;
+    border-radius: 8px;
+    background: #20312c;
+    color: #ffffff;
+    font-size: 0.9rem;
+}
+
+.file-field em {
+    overflow: hidden;
+    color: var(--muted);
+    font-size: 0.84rem;
+    font-style: normal;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.primary-button {
+    min-height: 46px;
+    border: 0;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #ffffff;
+    font-weight: 800;
+    transition: background 150ms ease, transform 150ms ease;
+}
+
+.primary-button:hover {
+    background: var(--accent-dark);
+    transform: translateY(-1px);
+}
+
+.journal-panel {
+    min-height: 540px;
+    padding: 22px;
+}
+
+.panel-header {
+    display: flex;
+    gap: 16px;
+    align-items: start;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--line);
+}
+
+.latest-date {
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: #fff5e7;
+    color: #805010;
+    font-size: 0.84rem;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.journal-card {
+    display: grid;
+    grid-template-columns: 190px minmax(0, 1fr);
+    gap: 18px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+}
+
+.journal-card:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.photo-link,
+.photo-placeholder {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #e4ebe7;
+}
+
+.photo-link img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-placeholder {
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--line);
+}
+
+.photo-placeholder span,
+.empty-state span {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    border-radius: 8px;
+    background: #20312c;
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 850;
+}
+
+.journal-content {
+    min-width: 0;
+}
+
+.journal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 0.84rem;
+}
+
+.journal-meta time {
+    color: var(--accent-dark);
+    font-weight: 800;
+}
+
+.journal-content p {
+    margin-bottom: 14px;
+    color: #475650;
+    line-height: 1.65;
+    white-space: pre-line;
+}
+
+.text-button {
+    min-height: 34px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--danger);
+    font-size: 0.88rem;
+    font-weight: 800;
+}
+
+.empty-state {
+    display: grid;
+    min-height: 380px;
+    place-items: center;
+    align-content: center;
+    justify-items: center;
+    padding: 32px;
+    text-align: center;
+}
+
+.empty-state h3 {
+    margin: 16px 0 8px;
+}
+
+.empty-state p {
+    max-width: 360px;
+    margin-bottom: 0;
+    color: var(--muted);
+    line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+    .topbar,
+    .workspace {
+        grid-template-columns: 1fr;
+    }
+
+    .entry-form {
+        position: static;
+    }
+}
+
+@media (max-width: 640px) {
+    .app-shell {
+        width: min(100% - 24px, 1180px);
+        padding-top: 18px;
+    }
+
+    .topbar {
+        padding: 18px 0;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-item {
+        min-height: 76px;
+    }
+
+    .journal-card {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-header {
+        display: grid;
+    }
+
+    .latest-date {
+        white-space: normal;
+    }
+}
