@@ -20,6 +20,7 @@
             <nav class="side-nav" aria-label="Navigasi utama">
                 <a class="{{ request()->routeIs('journals.index') ? 'active' : '' }}" href="{{ route('journals.index') }}">Jurnal</a>
                 <a href="{{ route('journals.print', request()->query()) }}" target="_blank" rel="noreferrer">Cetak laporan</a>
+                <a href="{{ route('journals.export', request()->query()) }}">Export CSV</a>
             </nav>
         </aside>
 
@@ -30,6 +31,11 @@
 
             @yield('content')
         </main>
+    </div>
+
+    <div class="photo-modal" data-photo-modal hidden>
+        <button class="photo-modal-close" type="button" data-photo-close aria-label="Tutup preview foto">Tutup</button>
+        <img src="" alt="Preview dokumentasi" data-photo-modal-image>
     </div>
 </body>
 </html>

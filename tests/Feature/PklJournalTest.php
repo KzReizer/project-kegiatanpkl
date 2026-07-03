@@ -12,7 +12,7 @@ class PklJournalTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_user_can_create_pkl_journal_with_photo(): void
+    public function test_user_can_create_pkl_journal_with_multiple_photos(): void
     {
         Storage::fake('public');
 
@@ -23,7 +23,10 @@ class PklJournalTest extends TestCase
             'category' => 'Kegiatan',
             'description' => 'Mengumpulkan dokumentasi dan menulis catatan kegiatan harian.',
             'learning' => 'Belajar menyusun catatan kerja.',
-            'photo' => UploadedFile::fake()->image('dokumentasi.jpg'),
+            'photos' => [
+                UploadedFile::fake()->image('dokumentasi-1.jpg'),
+                UploadedFile::fake()->image('dokumentasi-2.jpg'),
+            ],
         ]);
 
         $response
@@ -38,9 +41,11 @@ class PklJournalTest extends TestCase
             'description' => 'Mengumpulkan dokumentasi dan menulis catatan kegiatan harian.',
         ]);
 
-        $journal = PklJournal::firstOrFail();
+        $journal = PklJournal::with('photos')->firstOrFail();
 
-        Storage::disk('public')->assertExists($journal->photo_path);
+        $this->assertCount(2, $journal->photos);
+        Storage::disk('public')->assertExists($journal->photos->first()->path);
+        $this->assertSame($journal->photos->first()->path, $journal->photo_path);
     }
 
     public function test_user_can_search_journals(): void
@@ -65,7 +70,7 @@ class PklJournalTest extends TestCase
             ->assertDontSee('Bimbingan pembimbing');
     }
 
-    public function test_user_can_update_journal_and_remove_photo(): void
+    public function test_user_can_update_journal_and_remove_selected_photo(): void
     {
         Storage::fake('public');
 
@@ -78,13 +83,17 @@ class PklJournalTest extends TestCase
             'photo_path' => $path,
             'photo_original_name' => 'lama.jpg',
         ]);
+        $photo = $journal->photos()->create([
+            'path' => $path,
+            'original_name' => 'lama.jpg',
+        ]);
 
         $response = $this->followingRedirects()->put("/jurnal/{$journal->id}", [
             'activity_date' => now()->toDateString(),
             'title' => 'Judul baru',
             'category' => 'Selesai',
             'description' => 'Catatan baru',
-            'remove_photo' => '1',
+            'remove_photo_ids' => [$photo->id],
         ]);
 
         $response
@@ -98,7 +107,46 @@ class PklJournalTest extends TestCase
             'photo_path' => null,
         ]);
 
+        $this->assertDatabaseMissing('pkl_journal_photos', ['id' => $photo->id]);
         Storage::disk('public')->assertMissing($path);
+    }
+
+    public function test_user_can_duplicate_and_archive_journal(): void
+    {
+        $journal = PklJournal::create([
+            'activity_date' => now()->subDay()->toDateString(),
+            'title' => 'Input data harian',
+            'category' => 'Kegiatan',
+            'description' => 'Menginput data kegiatan.',
+        ]);
+
+        $this->post("/jurnal/{$journal->id}/duplicate")
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('pkl_journals', [
+            'title' => 'Salinan - Input data harian',
+            'description' => 'Menginput data kegiatan.',
+            'archived_at' => null,
+        ]);
+
+        $this->patch("/jurnal/{$journal->id}/archive")
+            ->assertRedirect('/');
+
+        $this->assertNotNull($journal->fresh()->archived_at);
+    }
+
+    public function test_export_page_downloads_csv(): void
+    {
+        PklJournal::create([
+            'activity_date' => now()->toDateString(),
+            'title' => 'Export kegiatan',
+            'category' => 'Dokumentasi',
+            'description' => 'Menyiapkan file laporan.',
+        ]);
+
+        $this->get('/export')
+            ->assertOk()
+            ->assertHeader('content-type', 'text/csv; charset=UTF-8');
     }
 
     public function test_print_page_can_render_report(): void

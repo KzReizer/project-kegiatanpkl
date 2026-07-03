@@ -18,11 +18,11 @@
 
         <section class="print-summary">
             <span>Total catatan: {{ $journals->count() }}</span>
-            @if ($filters['from'] ?? null)
-                <span>Dari: {{ \Illuminate\Support\Carbon::parse($filters['from'])->translatedFormat('d F Y') }}</span>
+            @if ($filters['month'] ?? null)
+                <span>Bulan: {{ \Illuminate\Support\Carbon::createFromFormat('Y-m', $filters['month'])->translatedFormat('F Y') }}</span>
             @endif
-            @if ($filters['to'] ?? null)
-                <span>Sampai: {{ \Illuminate\Support\Carbon::parse($filters['to'])->translatedFormat('d F Y') }}</span>
+            @if ($filters['day'] ?? null)
+                <span>Hari: {{ \Illuminate\Support\Carbon::parse($filters['day'])->translatedFormat('d F Y') }}</span>
             @endif
         </section>
 
@@ -47,8 +47,12 @@
                     @endif
                 </div>
 
-                @if ($journal->photo_path)
-                    <img src="{{ asset('storage/'.$journal->photo_path) }}" alt="Dokumentasi {{ $journal->title }}">
+                @if ($journal->photos->isNotEmpty())
+                    <div class="print-photo-grid">
+                        @foreach ($journal->photos->take(4) as $photo)
+                            <img src="{{ asset('storage/'.$photo->path) }}" alt="Dokumentasi {{ $journal->title }}">
+                        @endforeach
+                    </div>
                 @endif
             </article>
         @empty
