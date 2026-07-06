@@ -27,7 +27,7 @@ class PklJournalController extends Controller
     public function index(Request $request): View
     {
         $filters = $this->filters($request);
-        $journals = $this->journalQuery($filters)
+        $journals = $this->journalQuery($filters, $request->user())
             ->with('photos')
             ->withCount('photos')
             ->tap(fn (Builder $query) => $this->applySort($query, $filters['sort']))
@@ -40,7 +40,7 @@ class PklJournalController extends Controller
             'stats' => $this->stats(),
             'filters' => $filters,
             'categories' => self::CATEGORIES,
-            'latestJournal' => PklJournal::query()->whereNull('archived_at')->latest('activity_date')->latest('id')->first(),
+            'latestJournal' => $request->user()->journals()->whereNull('archived_at')->latest('activity_date')->latest('id')->first(),
             'filteredCount' => $journals->total(),
         ]);
     }
@@ -49,6 +49,7 @@ class PklJournalController extends Controller
     {
         $validated = $this->validatedData($request);
         unset($validated['photo'], $validated['photos'], $validated['remove_photo_ids']);
+        $validated['user_id'] = $request->user()->id;
 
         $journal = PklJournal::create($validated);
         $this->storePhotos($journal, $request->file('photos', []));
@@ -62,6 +63,7 @@ class PklJournalController extends Controller
 
     public function edit(PklJournal $journal): View
     {
+        $this->ensureCanManage($journal);
         $journal->load('photos');
 
         return view('journals.edit', [
@@ -72,6 +74,7 @@ class PklJournalController extends Controller
 
     public function update(Request $request, PklJournal $journal): RedirectResponse
     {
+        $this->ensureCanManage($journal);
         $validated = $this->validatedData($request);
         $removePhotoIds = collect($validated['remove_photo_ids'] ?? [])->map(fn ($id) => (int) $id)->all();
         unset($validated['photo'], $validated['photos'], $validated['remove_photo_ids']);
@@ -89,6 +92,7 @@ class PklJournalController extends Controller
 
     public function duplicate(PklJournal $journal): RedirectResponse
     {
+        $this->ensureCanManage($journal);
         $journal->load('photos');
 
         $copy = $journal->replicate([
@@ -127,6 +131,7 @@ class PklJournalController extends Controller
 
     public function archive(PklJournal $journal): RedirectResponse
     {
+        $this->ensureCanManage($journal);
         $journal->forceFill([
             'archived_at' => $journal->archived_at ? null : now(),
         ])->save();
@@ -138,6 +143,7 @@ class PklJournalController extends Controller
 
     public function destroy(PklJournal $journal): RedirectResponse
     {
+        $this->ensureCanManage($journal);
         $journal->load('photos');
 
         foreach ($journal->photos as $photo) {
@@ -158,7 +164,7 @@ class PklJournalController extends Controller
     public function print(Request $request): View
     {
         $filters = $this->filters($request);
-        $journals = $this->journalQuery($filters)
+        $journals = $this->journalQuery($filters, $request->user())
             ->with('photos')
             ->oldest('activity_date')
             ->oldest('id')
@@ -173,7 +179,7 @@ class PklJournalController extends Controller
     public function export(Request $request): StreamedResponse
     {
         $filters = $this->filters($request);
-        $journals = $this->journalQuery($filters)
+        $journals = $this->journalQuery($filters, $request->user())
             ->withCount('photos')
             ->tap(fn (Builder $query) => $this->applySort($query, $filters['sort']))
             ->get();
@@ -257,9 +263,9 @@ class PklJournalController extends Controller
         ];
     }
 
-    private function journalQuery(array $filters): Builder
+    private function journalQuery(array $filters, $user)
     {
-        return PklJournal::query()
+        return $user->journals()
             ->when($filters['status'] === 'active', fn (Builder $query) => $query->whereNull('archived_at'))
             ->when($filters['status'] === 'archived', fn (Builder $query) => $query->whereNotNull('archived_at'))
             ->when($filters['q'], function (Builder $query, string $keyword): void {
@@ -296,18 +302,18 @@ class PklJournalController extends Controller
     private function stats(): array
     {
         return [
-            'today' => PklJournal::query()->whereDate('activity_date', now()->toDateString())->whereNull('archived_at')->count(),
-            'days' => PklJournal::query()->whereNull('archived_at')->distinct()->count('activity_date'),
-            'entries' => PklJournal::query()->whereNull('archived_at')->count(),
-            'photos' => PklJournalPhoto::query()->whereHas('journal', fn (Builder $query) => $query->whereNull('archived_at'))->count(),
-            'this_month' => PklJournal::query()
+            'today' => auth()->user()->journals()->whereDate('activity_date', now()->toDateString())->whereNull('archived_at')->count(),
+            'days' => auth()->user()->journals()->whereNull('archived_at')->distinct()->count('activity_date'),
+            'entries' => auth()->user()->journals()->whereNull('archived_at')->count(),
+            'photos' => PklJournalPhoto::query()->whereHas('journal', fn (Builder $query) => $query->where('user_id', auth()->id())->whereNull('archived_at'))->count(),
+            'this_month' => auth()->user()->journals()
                 ->whereNull('archived_at')
                 ->whereBetween('activity_date', [
                     now()->startOfMonth()->toDateString(),
                     now()->endOfMonth()->toDateString(),
                 ])
                 ->count(),
-            'archived' => PklJournal::query()->whereNotNull('archived_at')->count(),
+            'archived' => auth()->user()->journals()->whereNotNull('archived_at')->count(),
         ];
     }
 
@@ -364,5 +370,10 @@ class PklJournalController extends Controller
             'photo_path' => $primary?->path,
             'photo_original_name' => $primary?->original_name,
         ])->save();
+    }
+
+    private function ensureCanManage(PklJournal $journal): void
+    {
+        abort_unless(auth()->user()?->isAdmin() || $journal->user_id === auth()->id(), 403);
     }
 }

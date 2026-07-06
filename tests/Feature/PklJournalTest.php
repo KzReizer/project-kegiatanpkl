@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\PklJournal;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -15,8 +16,9 @@ class PklJournalTest extends TestCase
     public function test_user_can_create_pkl_journal_with_multiple_photos(): void
     {
         Storage::fake('public');
+        $user = User::factory()->create();
 
-        $response = $this->followingRedirects()->post('/jurnal', [
+        $response = $this->actingAs($user)->followingRedirects()->post('/jurnal', [
             'activity_date' => now()->toDateString(),
             'title' => 'Membuat halaman laporan',
             'location' => 'Ruang IT',
@@ -35,6 +37,7 @@ class PklJournalTest extends TestCase
             ->assertSee('Mengumpulkan dokumentasi dan menulis catatan kegiatan harian.');
 
         $this->assertDatabaseHas('pkl_journals', [
+            'user_id' => $user->id,
             'title' => 'Membuat halaman laporan',
             'location' => 'Ruang IT',
             'category' => 'Kegiatan',
@@ -50,7 +53,10 @@ class PklJournalTest extends TestCase
 
     public function test_user_can_search_journals(): void
     {
+        $user = User::factory()->create();
+
         PklJournal::create([
+            'user_id' => $user->id,
             'activity_date' => now()->toDateString(),
             'title' => 'Merapikan laporan',
             'category' => 'Dokumentasi',
@@ -58,13 +64,14 @@ class PklJournalTest extends TestCase
         ]);
 
         PklJournal::create([
+            'user_id' => $user->id,
             'activity_date' => now()->toDateString(),
             'title' => 'Bimbingan pembimbing',
             'category' => 'Bimbingan',
             'description' => 'Membahas evaluasi mingguan.',
         ]);
 
-        $this->get('/?q=laporan')
+        $this->actingAs($user)->get(route('journals.index', ['q' => 'laporan']))
             ->assertOk()
             ->assertSee('Merapikan laporan')
             ->assertDontSee('Bimbingan pembimbing');
@@ -73,9 +80,11 @@ class PklJournalTest extends TestCase
     public function test_user_can_update_journal_and_remove_selected_photo(): void
     {
         Storage::fake('public');
+        $user = User::factory()->create();
 
         $path = UploadedFile::fake()->image('lama.jpg')->store('pkl-photos', 'public');
         $journal = PklJournal::create([
+            'user_id' => $user->id,
             'activity_date' => now()->toDateString(),
             'title' => 'Judul lama',
             'category' => 'Kegiatan',
@@ -88,7 +97,7 @@ class PklJournalTest extends TestCase
             'original_name' => 'lama.jpg',
         ]);
 
-        $response = $this->followingRedirects()->put("/jurnal/{$journal->id}", [
+        $response = $this->actingAs($user)->followingRedirects()->put("/jurnal/{$journal->id}", [
             'activity_date' => now()->toDateString(),
             'title' => 'Judul baru',
             'category' => 'Selesai',
@@ -113,52 +122,59 @@ class PklJournalTest extends TestCase
 
     public function test_user_can_duplicate_and_archive_journal(): void
     {
+        $user = User::factory()->create();
         $journal = PklJournal::create([
+            'user_id' => $user->id,
             'activity_date' => now()->subDay()->toDateString(),
             'title' => 'Input data harian',
             'category' => 'Kegiatan',
             'description' => 'Menginput data kegiatan.',
         ]);
 
-        $this->post("/jurnal/{$journal->id}/duplicate")
+        $this->actingAs($user)->post("/jurnal/{$journal->id}/duplicate")
             ->assertRedirect();
 
         $this->assertDatabaseHas('pkl_journals', [
+            'user_id' => $user->id,
             'title' => 'Salinan - Input data harian',
             'description' => 'Menginput data kegiatan.',
             'archived_at' => null,
         ]);
 
-        $this->patch("/jurnal/{$journal->id}/archive")
-            ->assertRedirect('/');
+        $this->actingAs($user)->patch("/jurnal/{$journal->id}/archive")
+            ->assertRedirect(route('journals.index'));
 
         $this->assertNotNull($journal->fresh()->archived_at);
     }
 
     public function test_export_page_downloads_csv(): void
     {
+        $user = User::factory()->create();
         PklJournal::create([
+            'user_id' => $user->id,
             'activity_date' => now()->toDateString(),
             'title' => 'Export kegiatan',
             'category' => 'Dokumentasi',
             'description' => 'Menyiapkan file laporan.',
         ]);
 
-        $this->get('/export')
+        $this->actingAs($user)->get('/export')
             ->assertOk()
             ->assertHeader('content-type', 'text/csv; charset=UTF-8');
     }
 
     public function test_print_page_can_render_report(): void
     {
+        $user = User::factory()->create();
         PklJournal::create([
+            'user_id' => $user->id,
             'activity_date' => now()->toDateString(),
             'title' => 'Rekap kegiatan',
             'category' => 'Dokumentasi',
             'description' => 'Menyiapkan bahan laporan.',
         ]);
 
-        $this->get('/laporan')
+        $this->actingAs($user)->get('/laporan')
             ->assertOk()
             ->assertSee('Rekap Kegiatan Harian')
             ->assertSee('Rekap kegiatan');
@@ -166,8 +182,39 @@ class PklJournalTest extends TestCase
 
     public function test_homepage_shows_empty_state(): void
     {
-        $this->get('/')
+        $this->actingAs(User::factory()->create())->get(route('journals.index'))
             ->assertOk()
             ->assertSee('Catatan tidak ditemukan');
+    }
+
+    public function test_admin_can_open_account_report_detail(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $student = User::factory()->create(['name' => 'Siswa PKL']);
+
+        PklJournal::create([
+            'user_id' => $student->id,
+            'activity_date' => now()->toDateString(),
+            'title' => 'Laporan siswa',
+            'category' => 'Kegiatan',
+            'description' => 'Isi laporan siswa.',
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.users.index'))
+            ->assertOk()
+            ->assertSee('Siswa PKL');
+
+        $this->actingAs($admin)
+            ->get(route('admin.users.show', $student))
+            ->assertOk()
+            ->assertSee('Laporan siswa');
+    }
+
+    public function test_non_admin_cannot_open_admin_pages(): void
+    {
+        $this->actingAs(User::factory()->create())
+            ->get(route('admin.users.index'))
+            ->assertForbidden();
     }
 }

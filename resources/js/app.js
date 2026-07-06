@@ -1,3 +1,11 @@
+
+
+import Alpine from 'alpinejs';
+
+window.Alpine = Alpine;
+
+Alpine.start();
+
 const debounce = (callback, delay = 450) => {
     let timer;
 
@@ -24,7 +32,7 @@ document.querySelectorAll('[data-realtime-filter]').forEach((form) => {
         input.addEventListener('input', submit);
     });
 
-    form.querySelectorAll('select, input[type="month"], input[type="date"]').forEach((input) => {
+    form.querySelectorAll('select, input[type="month"]').forEach((input) => {
         input.addEventListener('change', () => form.requestSubmit());
     });
 });
@@ -58,8 +66,7 @@ const compressImage = (file) => new Promise((resolve) => {
                 return;
             }
 
-            const name = file.name.replace(/\.[^.]+$/, '.jpg');
-            resolve(new File([blob], name, {
+            resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {
                 type: 'image/jpeg',
                 lastModified: Date.now(),
             }));
@@ -75,8 +82,8 @@ const compressImage = (file) => new Promise((resolve) => {
 });
 
 const renderPreview = (field, files) => {
-    const preview = field.querySelector('[data-upload-preview]');
-    const photoName = field.querySelector('.photo-name');
+    const preview = field?.querySelector('[data-upload-preview]');
+    const photoName = field?.querySelector('.photo-name');
 
     if (photoName) {
         photoName.textContent = files.length
@@ -168,4 +175,19 @@ modal?.addEventListener('click', (event) => {
         modal.hidden = true;
         modalImage.src = '';
     }
+});
+
+const revealObserver = 'IntersectionObserver' in window
+    ? new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12 })
+    : null;
+
+document.querySelectorAll('.reveal-on-scroll').forEach((element) => {
+    revealObserver?.observe(element);
 });

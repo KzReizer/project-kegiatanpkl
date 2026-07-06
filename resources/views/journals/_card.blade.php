@@ -76,22 +76,24 @@
             </div>
         </details>
 
-        <div class="card-actions">
-            <a class="secondary-button compact-button" href="{{ route('journals.edit', $journal) }}">Edit</a>
-            <form action="{{ route('journals.duplicate', $journal) }}" method="POST">
-                @csrf
-                <button class="secondary-button compact-button" type="submit">Duplikat</button>
-            </form>
-            <form action="{{ route('journals.archive', array_merge(['journal' => $journal], request()->query())) }}" method="POST">
-                @csrf
-                @method('PATCH')
-                <button class="secondary-button compact-button" type="submit">{{ $journal->archived_at ? 'Pulihkan' : 'Arsip' }}</button>
-            </form>
-            <form action="{{ route('journals.destroy', $journal) }}" method="POST" onsubmit="return confirm('Hapus permanen catatan ini?')">
-                @csrf
-                @method('DELETE')
-                <button class="danger-button compact-button" type="submit">Hapus</button>
-            </form>
-        </div>
+        @if ($showActions ?? true)
+            <div class="card-actions">
+                <a class="secondary-button compact-button" href="{{ route('journals.edit', $journal) }}">Edit</a>
+                <form action="{{ route('journals.duplicate', $journal) }}" method="POST">
+                    @csrf
+                    <button class="secondary-button compact-button" type="submit">Duplikat</button>
+                </form>
+                <form action="{{ route('journals.archive', array_merge(['journal' => $journal], request()->query())) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <button class="secondary-button compact-button" type="submit">{{ $journal->archived_at ? 'Pulihkan' : 'Arsip' }}</button>
+                </form>
+                <form action="{{ route('journals.destroy', $journal) }}" method="POST" onsubmit="return confirm('Hapus permanen catatan ini?')">
+                    @csrf
+                    @method('DELETE')
+                    <button class="danger-button compact-button" type="submit">Hapus</button>
+                </form>
+            </div>
+        @endif
     </div>
 </article>
