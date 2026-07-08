@@ -1,10 +1,131 @@
 
 
 import Alpine from 'alpinejs';
+import { createIcons, icons } from 'lucide';
 
 window.Alpine = Alpine;
 
 Alpine.start();
+
+const renderIcons = () => {
+    createIcons({
+        icons,
+        attrs: {
+            'aria-hidden': 'true',
+        },
+    });
+};
+
+const root = document.documentElement;
+const getStoredTheme = () => localStorage.getItem('theme');
+const prefersDark = () => window.matchMedia?.('(prefers-color-scheme: dark)').matches;
+const activeTheme = () => getStoredTheme() || (prefersDark() ? 'dark' : 'light');
+
+const setTheme = (theme) => {
+    root.classList.toggle('dark', theme === 'dark');
+    root.classList.toggle('light', theme === 'light');
+
+    document.querySelectorAll('[data-theme-icon]').forEach((icon) => {
+        icon.innerHTML = `<i data-lucide="${theme === 'dark' ? 'sun' : 'moon'}"></i>`;
+    });
+
+    renderIcons();
+};
+
+setTheme(activeTheme());
+
+document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+    button.addEventListener('click', () => {
+        const nextTheme = root.classList.contains('dark') ? 'light' : 'dark';
+        localStorage.setItem('theme', nextTheme);
+        setTheme(nextTheme);
+    });
+});
+
+const nav = document.querySelector('[data-site-nav]');
+const syncNav = () => nav?.classList.toggle('is-scrolled', window.scrollY > 8);
+syncNav();
+window.addEventListener('scroll', syncNav, { passive: true });
+
+const animateCounter = (counter) => {
+    const target = Number.parseInt(counter.dataset.counter || counter.textContent, 10);
+
+    if (!Number.isFinite(target)) {
+        return;
+    }
+
+    const formatter = new Intl.NumberFormat('id-ID');
+
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+        counter.textContent = formatter.format(target);
+        return;
+    }
+
+    const duration = 900;
+    const start = performance.now();
+
+    const tick = (time) => {
+        const progress = Math.min((time - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        counter.textContent = formatter.format(Math.round(target * eased));
+
+        if (progress < 1) {
+            requestAnimationFrame(tick);
+        }
+    };
+
+    requestAnimationFrame(tick);
+};
+
+const counterObserver = 'IntersectionObserver' in window
+    ? new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (!entry.isIntersecting || entry.target.dataset.counted) {
+                return;
+            }
+
+            entry.target.dataset.counted = 'true';
+            animateCounter(entry.target);
+            counterObserver.unobserve(entry.target);
+        });
+    }, { threshold: 0.45 })
+    : null;
+
+document.querySelectorAll('[data-counter]').forEach((counter) => {
+    if (counterObserver) {
+        counterObserver.observe(counter);
+    } else {
+        animateCounter(counter);
+    }
+});
+
+document.addEventListener('click', (event) => {
+    const target = event.target.closest('.primary-button, .secondary-button, .danger-button, .icon-button, .theme-toggle, .mobile-menu-button, .user-menu-button');
+
+    if (!target || target.disabled) {
+        return;
+    }
+
+    const rect = target.getBoundingClientRect();
+    const ripple = document.createElement('span');
+
+    ripple.className = 'button-ripple';
+    ripple.style.left = `${event.clientX - rect.left}px`;
+    ripple.style.top = `${event.clientY - rect.top}px`;
+
+    target.appendChild(ripple);
+    ripple.addEventListener('animationend', () => ripple.remove(), { once: true });
+});
+
+document.querySelectorAll('[data-toast]').forEach((toast) => {
+    const close = () => {
+        toast.classList.add('is-leaving');
+        toast.addEventListener('animationend', () => toast.remove(), { once: true });
+    };
+
+    toast.querySelector('[data-toast-close]')?.addEventListener('click', close);
+    window.setTimeout(close, 4200);
+});
 
 const debounce = (callback, delay = 450) => {
     let timer;
@@ -191,3 +312,5 @@ const revealObserver = 'IntersectionObserver' in window
 document.querySelectorAll('.reveal-on-scroll').forEach((element) => {
     revealObserver?.observe(element);
 });
+
+renderIcons();

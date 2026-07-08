@@ -5,20 +5,36 @@
         <div>
             <p class="eyebrow">Panel admin</p>
             <h1>Semua akun PKL</h1>
+            <p class="subtle-text">Pantau progres laporan, dokumentasi, dan status arsip dari setiap akun peserta.</p>
         </div>
 
         <div class="summary-grid">
             <article class="summary-item animate-rise">
-                <span class="summary-value">{{ $totalUsers }}</span>
-                <span class="summary-label">Akun</span>
+                <span class="summary-top">
+                    <span>
+                        <span class="summary-value" data-counter="{{ $totalUsers }}">{{ $totalUsers }}</span>
+                        <span class="summary-label">Akun</span>
+                    </span>
+                    <span class="summary-icon"><i data-lucide="users-round"></i></span>
+                </span>
             </article>
             <article class="summary-item animate-rise delay-1">
-                <span class="summary-value">{{ $totalJournals }}</span>
-                <span class="summary-label">Laporan</span>
+                <span class="summary-top">
+                    <span>
+                        <span class="summary-value" data-counter="{{ $totalJournals }}">{{ $totalJournals }}</span>
+                        <span class="summary-label">Laporan</span>
+                    </span>
+                    <span class="summary-icon"><i data-lucide="files"></i></span>
+                </span>
             </article>
             <article class="summary-item animate-rise delay-2">
-                <span class="summary-value">{{ $totalPhotos }}</span>
-                <span class="summary-label">Foto</span>
+                <span class="summary-top">
+                    <span>
+                        <span class="summary-value" data-counter="{{ $totalPhotos }}">{{ $totalPhotos }}</span>
+                        <span class="summary-label">Foto</span>
+                    </span>
+                    <span class="summary-icon"><i data-lucide="image"></i></span>
+                </span>
             </article>
         </div>
     </section>
@@ -55,7 +71,7 @@
             </a>
         @empty
             <div class="empty-state">
-                <span>ADM</span>
+                <span class="empty-illustration"><i data-lucide="users-round"></i></span>
                 <h3>Belum ada akun</h3>
             </div>
         @endforelse

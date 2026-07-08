@@ -9,26 +9,32 @@
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" />
+
+        <script>
+            const storedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            document.documentElement.classList.add(storedTheme || (prefersDark ? 'dark' : 'light'));
+        </script>
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
+        <div class="app-shell">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
             @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <header class="page-heading">
+                    <div class="page-heading-inner">
                         {{ $header }}
                     </div>
                 </header>
             @endisset
 
             <!-- Page Content -->
-            <main @class(['content-shell' => ! isset($slot)])>
+            <main @class(['app-main', 'content-shell' => ! isset($slot)])>
                 @if (isset($slot))
                     {{ $slot }}
                 @else
@@ -37,8 +43,26 @@
             </main>
         </div>
 
+        @if (session('status'))
+            <div class="toast-stack" aria-live="polite">
+                <div class="toast" data-toast>
+                    <span class="toast-icon"><i data-lucide="check"></i></span>
+                    <div>
+                        <strong>Berhasil</strong>
+                        <p>{{ session('status') }}</p>
+                    </div>
+                    <button class="toast-close" type="button" data-toast-close aria-label="Tutup notifikasi">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+            </div>
+        @endif
+
         <div class="photo-modal" data-photo-modal hidden>
-            <button class="photo-modal-close" type="button" data-photo-close aria-label="Tutup preview foto">Tutup</button>
+            <button class="photo-modal-close" type="button" data-photo-close aria-label="Tutup preview foto">
+                <i data-lucide="x"></i>
+                Tutup
+            </button>
             <img src="" alt="Preview dokumentasi" data-photo-modal-image>
         </div>
     </body>

@@ -1,29 +1,25 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
-                </div>
+    <div class="content-shell profile-shell">
+        <section class="page-header compact-header">
+            <div>
+                <p class="eyebrow">Pengaturan akun</p>
+                <h1>Profile</h1>
+                <p class="subtle-text">Kelola identitas, keamanan, dan preferensi akun Jurnal PKL Anda.</p>
             </div>
+        </section>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
-            </div>
+        <section class="profile-grid">
+            <article class="profile-card">
+                @include('profile.partials.update-profile-information-form')
+            </article>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
-            </div>
-        </div>
+            <article class="profile-card">
+                @include('profile.partials.update-password-form')
+            </article>
+
+            <article class="profile-card danger-zone">
+                @include('profile.partials.delete-user-form')
+            </article>
+        </section>
     </div>
 </x-app-layout>

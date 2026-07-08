@@ -3,15 +3,18 @@
     $journalPhotos = $isEdit ? $journal->photos : collect();
 @endphp
 
-<form class="entry-form" action="{{ $isEdit ? route('journals.update', $journal) : route('journals.store') }}" method="POST" enctype="multipart/form-data">
+<form id="journal-form" class="entry-form" action="{{ $isEdit ? route('journals.update', $journal) : route('journals.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
     @if ($isEdit)
         @method('PUT')
     @endif
 
     <div class="section-heading">
-        <p class="eyebrow">{{ $isEdit ? 'Edit jurnal' : 'Input kegiatan' }}</p>
-        <h2>{{ $isEdit ? 'Perbarui catatan' : 'Catatan harian' }}</h2>
+        <div>
+            <p class="eyebrow">{{ $isEdit ? 'Edit jurnal' : 'Input kegiatan' }}</p>
+            <h2>{{ $isEdit ? 'Perbarui catatan' : 'Catatan harian' }}</h2>
+        </div>
+        <span class="form-icon"><i data-lucide="{{ $isEdit ? 'pencil-line' : 'plus' }}"></i></span>
     </div>
 
     <details class="form-section" open>
@@ -115,7 +118,7 @@
             <label class="file-field dropzone" data-dropzone>
                 <span>{{ $isEdit ? 'Tambah foto dokumentasi' : 'Foto dokumentasi' }}</span>
                 <input class="photo-input" type="file" name="photos[]" accept="image/*" multiple>
-                <strong>Pilih atau drop foto</strong>
+                <strong><i data-lucide="upload-cloud"></i> Pilih atau drop foto</strong>
                 <em class="photo-name">Belum ada foto dipilih</em>
                 <div class="upload-preview" data-upload-preview></div>
                 @error('photos')
@@ -129,9 +132,15 @@
     </details>
 
     <div class="form-actions">
-        <button class="primary-button" type="submit">{{ $isEdit ? 'Simpan perubahan' : 'Simpan catatan' }}</button>
+        <button class="primary-button" type="submit">
+            <i data-lucide="{{ $isEdit ? 'save' : 'check' }}"></i>
+            {{ $isEdit ? 'Simpan perubahan' : 'Simpan catatan' }}
+        </button>
         @if ($isEdit)
-            <a class="secondary-button" href="{{ route('journals.index') }}">Batal</a>
+            <a class="secondary-button" href="{{ route('journals.index') }}">
+                <i data-lucide="x"></i>
+                Batal
+            </a>
         @endif
     </div>
 </form>

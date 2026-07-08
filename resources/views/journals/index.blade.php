@@ -14,24 +14,45 @@
         <div>
             <p class="eyebrow">Jurnal kegiatan harian</p>
             <h1>Dokumentasi PKL</h1>
+            <p class="subtle-text">Catat progres harian, simpan dokumentasi, dan susun laporan PKL dalam satu workspace yang rapi.</p>
         </div>
 
         <div class="summary-grid">
             <a class="summary-item" href="{{ route('journals.index', ['day' => now()->toDateString()]) }}">
-                <span class="summary-value">{{ $stats['today'] }}</span>
-                <span class="summary-label">Hari ini</span>
+                <span class="summary-top">
+                    <span>
+                        <span class="summary-value" data-counter="{{ $stats['today'] }}">{{ $stats['today'] }}</span>
+                        <span class="summary-label">Hari ini</span>
+                    </span>
+                    <span class="summary-icon"><i data-lucide="calendar-check"></i></span>
+                </span>
             </a>
             <a class="summary-item" href="{{ route('journals.index', ['photo' => 'with']) }}">
-                <span class="summary-value">{{ $stats['photos'] }}</span>
-                <span class="summary-label">Foto</span>
+                <span class="summary-top">
+                    <span>
+                        <span class="summary-value" data-counter="{{ $stats['photos'] }}">{{ $stats['photos'] }}</span>
+                        <span class="summary-label">Foto</span>
+                    </span>
+                    <span class="summary-icon"><i data-lucide="image"></i></span>
+                </span>
             </a>
             <a class="summary-item" href="{{ route('journals.index', ['month' => now()->format('Y-m')]) }}">
-                <span class="summary-value">{{ $stats['this_month'] }}</span>
-                <span class="summary-label">Bulan ini</span>
+                <span class="summary-top">
+                    <span>
+                        <span class="summary-value" data-counter="{{ $stats['this_month'] }}">{{ $stats['this_month'] }}</span>
+                        <span class="summary-label">Bulan ini</span>
+                    </span>
+                    <span class="summary-icon"><i data-lucide="trending-up"></i></span>
+                </span>
             </a>
             <a class="summary-item" href="{{ route('journals.index', ['status' => 'archived']) }}">
-                <span class="summary-value">{{ $stats['archived'] }}</span>
-                <span class="summary-label">Arsip</span>
+                <span class="summary-top">
+                    <span>
+                        <span class="summary-value" data-counter="{{ $stats['archived'] }}">{{ $stats['archived'] }}</span>
+                        <span class="summary-label">Arsip</span>
+                    </span>
+                    <span class="summary-icon"><i data-lucide="archive"></i></span>
+                </span>
             </a>
         </div>
     </section>
@@ -48,6 +69,7 @@
 
                 @if ($latestJournal)
                     <p class="latest-date">
+                        <i data-lucide="clock-3"></i>
                         Terakhir: {{ $latestJournal->activity_date->locale('id')->translatedFormat('d F Y') }}
                     </p>
                 @endif
@@ -57,7 +79,10 @@
                 <div class="filter-primary">
                     <label class="field search-field">
                         <span>Cari realtime</span>
-                        <input type="search" name="q" value="{{ $filters['q'] }}" placeholder="Judul, catatan, tempat">
+                        <span class="field-control-wrap">
+                            <i data-lucide="search"></i>
+                            <input type="search" name="q" value="{{ $filters['q'] }}" placeholder="Judul, catatan, tempat">
+                        </span>
                     </label>
 
                     <label class="field filter-mini">
@@ -79,10 +104,22 @@
                     </label>
 
                     <div class="filter-actions">
-                        <button class="primary-button compact-button" type="submit">Cari</button>
-                        <a class="secondary-button compact-button" href="{{ route('journals.index') }}">Reset</a>
-                        <a class="secondary-button compact-button" href="{{ route('journals.print', request()->query()) }}" target="_blank" rel="noreferrer">Cetak</a>
-                        <a class="secondary-button compact-button" href="{{ route('journals.export', request()->query()) }}">Export</a>
+                        <button class="primary-button compact-button" type="submit">
+                            <i data-lucide="search"></i>
+                            Cari
+                        </button>
+                        <a class="secondary-button compact-button" href="{{ route('journals.index') }}">
+                            <i data-lucide="rotate-ccw"></i>
+                            Reset
+                        </a>
+                        <a class="secondary-button compact-button" href="{{ route('journals.print', request()->query()) }}" target="_blank" rel="noreferrer">
+                            <i data-lucide="printer"></i>
+                            Cetak
+                        </a>
+                        <a class="secondary-button compact-button" href="{{ route('journals.export', request()->query()) }}">
+                            <i data-lucide="download"></i>
+                            Export
+                        </a>
                     </div>
                 </div>
 
@@ -98,6 +135,7 @@
                         @if (filled($filters['day']))
                             <input type="hidden" name="day" value="{{ $filters['day'] }}">
                             <div class="filter-chip">
+                                <i data-lucide="calendar-days"></i>
                                 Hari: {{ \Illuminate\Support\Carbon::parse($filters['day'])->translatedFormat('d F Y') }}
                             </div>
                         @endif
@@ -147,9 +185,13 @@
                     </section>
                 @empty
                     <div class="empty-state">
-                        <span>LOG</span>
+                        <span class="empty-illustration"><i data-lucide="notebook-pen"></i></span>
                         <h3>Catatan tidak ditemukan</h3>
                         <p>Ubah kata kunci, filter tanggal, atau status arsip.</p>
+                        <a class="primary-button" href="#journal-form">
+                            <i data-lucide="plus"></i>
+                            Buat catatan pertama
+                        </a>
                     </div>
                 @endforelse
             </div>

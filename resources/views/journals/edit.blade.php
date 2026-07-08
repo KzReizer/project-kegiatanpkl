@@ -6,6 +6,7 @@
             <div>
                 <p class="eyebrow">Edit catatan</p>
                 <h1>{{ $journal->title }}</h1>
+                <p class="subtle-text">Perbarui detail kegiatan, dokumentasi, atau rencana tindak lanjut tanpa mengubah riwayat lainnya.</p>
             </div>
         </header>
 

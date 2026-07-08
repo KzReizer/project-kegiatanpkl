@@ -1,18 +1,27 @@
 <x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Dashboard') }}
-        </h2>
-    </x-slot>
+    <div class="content-shell">
+        <section class="page-header compact-header">
+            <div>
+                <p class="eyebrow">Dashboard</p>
+                <h1>Workspace PKL</h1>
+                <p class="subtle-text">Lanjutkan pencatatan kegiatan harian dan dokumentasi PKL Anda.</p>
+            </div>
+        </section>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    <a class="text-emerald-700 font-semibold" href="{{ route('journals.index') }}">
-                        Buka jurnal PKL
-                    </a>
+        <div class="profile-card">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Akses cepat</p>
+                    <h2>Jurnal PKL</h2>
                 </div>
+                <span class="card-icon"><i data-lucide="book-open-text"></i></span>
+            </div>
+
+            <div class="form-actions" style="margin-top: 1rem;">
+                <a class="primary-button" href="{{ route('journals.index') }}">
+                    <i data-lucide="arrow-right"></i>
+                    Buka jurnal PKL
+                </a>
             </div>
         </div>
     </div>

@@ -13,13 +13,16 @@
         <div>
             <p class="eyebrow">Detail akun</p>
             <h1>{{ $user->name }}</h1>
-            <p class="subtle-text">{{ $user->email }} • role {{ $user->role }}</p>
+            <p class="subtle-text">{{ $user->email }} - role {{ $user->role }}</p>
         </div>
 
         <div class="account-detail-box">
-            <strong>{{ $filteredCount }}</strong>
+            <strong data-counter="{{ $filteredCount }}">{{ $filteredCount }}</strong>
             <span>laporan ditemukan</span>
-            <a class="secondary-button compact-button" href="{{ route('admin.users.index') }}">Kembali</a>
+            <a class="secondary-button compact-button" href="{{ route('admin.users.index') }}">
+                <i data-lucide="arrow-left"></i>
+                Kembali
+            </a>
         </div>
     </section>
 
@@ -28,7 +31,10 @@
             <div class="filter-primary">
                 <label class="field search-field">
                     <span>Cari laporan</span>
-                    <input type="search" name="q" value="{{ $filters['q'] }}" placeholder="Judul, catatan, tempat">
+                    <span class="field-control-wrap">
+                        <i data-lucide="search"></i>
+                        <input type="search" name="q" value="{{ $filters['q'] }}" placeholder="Judul, catatan, tempat">
+                    </span>
                 </label>
 
                 <label class="field filter-mini">
@@ -104,7 +110,7 @@
                 </section>
             @empty
                 <div class="empty-state">
-                    <span>LOG</span>
+                    <span class="empty-illustration"><i data-lucide="file-search"></i></span>
                     <h3>Laporan tidak ditemukan</h3>
                 </div>
             @endforelse

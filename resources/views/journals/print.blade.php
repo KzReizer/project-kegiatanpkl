@@ -4,16 +4,21 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Laporan PKL</title>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=plus-jakarta-sans:400,500,600,700,800&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="print-body">
+<body class="print-body font-sans antialiased">
     <main class="print-shell">
         <header class="print-header">
             <div>
                 <p class="eyebrow">Laporan PKL</p>
                 <h1>Rekap Kegiatan Harian</h1>
             </div>
-            <button class="primary-button compact-button no-print" onclick="window.print()" type="button">Print</button>
+            <button class="primary-button compact-button no-print" onclick="window.print()" type="button">
+                <i data-lucide="printer"></i>
+                Print
+            </button>
         </header>
 
         <section class="print-summary">
@@ -57,7 +62,7 @@
             </article>
         @empty
             <div class="empty-state">
-                <span>LOG</span>
+                <span class="empty-illustration"><i data-lucide="file-search"></i></span>
                 <h3>Belum ada data laporan</h3>
             </div>
         @endforelse
