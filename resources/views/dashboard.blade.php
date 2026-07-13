@@ -8,6 +8,11 @@
             </div>
         </section>
 
+        <!-- Attendance Check-In Card -->
+        @include('attendances._card-checkin')
+
+        <div style="margin-top: 2rem;"></div>
+
         <div class="profile-card">
             <div class="section-heading">
                 <div>

@@ -20,6 +20,10 @@
                     <i data-lucide="book-open-text"></i>
                     {{ __('Jurnal PKL') }}
                 </x-nav-link>
+                <x-nav-link :href="route('attendances.index')" :active="request()->routeIs('attendances.*')">
+                    <i data-lucide="check-circle"></i>
+                    {{ __('Absensi') }}
+                </x-nav-link>
                 @if (Auth::user()->isAdmin())
                     <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.*')">
                         <i data-lucide="shield-check"></i>
@@ -84,6 +88,10 @@
             <x-responsive-nav-link :href="route('journals.index')" :active="request()->routeIs('journals.*')">
                 <i data-lucide="book-open-text"></i>
                 {{ __('Jurnal PKL') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('attendances.index')" :active="request()->routeIs('attendances.*')">
+                <i data-lucide="check-circle"></i>
+                {{ __('Absensi') }}
             </x-responsive-nav-link>
             @if (Auth::user()->isAdmin())
                 <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.*')">

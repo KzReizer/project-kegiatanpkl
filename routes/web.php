@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminReportController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\PklJournalController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -26,8 +27,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/jurnal/{journal}', [PklJournalController::class, 'update'])->name('journals.update');
     Route::delete('/jurnal/{journal}', [PklJournalController::class, 'destroy'])->name('journals.destroy');
 
+    // Attendance Routes
+    Route::get('/absensi', [AttendanceController::class, 'index'])->name('attendances.index');
+    Route::get('/absensi/status', [AttendanceController::class, 'getTodayStatus'])->name('attendances.status');
+    Route::post('/absensi/check-in', [AttendanceController::class, 'checkIn'])->name('attendances.check-in');
+    Route::post('/absensi/check-out', [AttendanceController::class, 'checkOut'])->name('attendances.check-out');
+
     Route::get('/admin', [AdminReportController::class, 'index'])->name('admin.users.index');
     Route::get('/admin/users/{user}', [AdminReportController::class, 'show'])->name('admin.users.show');
+
+    // Admin Attendance Report
+    Route::get('/admin/absensi', [AttendanceController::class, 'report'])->name('admin.attendances.report');
+    Route::patch('/absensi/{attendance}/status', [AttendanceController::class, 'setStatus'])->name('attendances.set-status');
 });
 
 Route::middleware('auth')->group(function () {
