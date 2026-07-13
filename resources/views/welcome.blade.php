@@ -19,7 +19,7 @@
             <section class="welcome-panel">
                 <div>
                     <p class="eyebrow">Jurnal PKL</p>
-                    <h1>Catatan internship yang rapi dan siap dilaporkan.</h1>
+                    <h1>Laporan harian PKL</h1>
                     <p>Kelola kegiatan harian, unggah dokumentasi, filter riwayat, dan cetak laporan PKL dari satu dashboard modern.</p>
 
                     <div class="welcome-actions">
@@ -45,7 +45,7 @@
                     <div class="preview-row">
                         <span class="card-icon"><i data-lucide="calendar-check"></i></span>
                         <div>
-                            <strong>12 catatan bulan ini</strong>
+                            <strong>Timeline</strong>
                             <span>Aktivitas tersusun per timeline.</span>
                         </div>
                     </div>
